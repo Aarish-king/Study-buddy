@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyBuddy | Student Planner</title>
+<style>
+:root{--ink:#17233d;--muted:#66738b;--purple:#6941c6;--pink:#ff6b9a;--blue:#3587f5;--mint:#2cbf9b;--yellow:#ffc857;--bg:#f5f4ff;--card:#fff;--line:#e7e5f3}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(135deg,#f4f0ff,#edf8ff 55%,#fff4f8);min-height:100vh}
+header{padding:24px max(20px,calc((100% - 1150px)/2));background:linear-gradient(110deg,#5835b5,#7a56dc 55%,#e65c9b);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-size:30px;font-weight:900;letter-spacing:-.5px}.sub{margin-top:5px;opacity:.93}.datepill{background:#ffffff22;border:1px solid #ffffff55;border-radius:14px;padding:10px 14px}
+main{max-width:1150px;margin:22px auto;padding:0 16px}.hero{background:#fff;border-radius:22px;padding:22px 24px;box-shadow:0 8px 28px #3c267510;border:1px solid var(--line);margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.55}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:0 5px 18px #3c267508}.stat .emoji{font-size:23px}.stat .label{color:var(--muted);font-size:13px;margin-top:7px}.stat .num{font-size:28px;font-weight:900;margin-top:3px}
+.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 18px}.tab{border:1px solid #ded7f4;background:#fff;color:#5635a7;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.tab.active{background:var(--purple);color:white;border-color:var(--purple);box-shadow:0 5px 12px #6941c633}
+.view{display:none}.view.active{display:block}.columns{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;margin-bottom:18px;box-shadow:0 6px 22px #3c267508}.panel h2{font-size:19px;margin:0 0 15px}.hint{font-size:13px;color:var(--muted);line-height:1.5}
+form{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-weight:800;font-size:13px;display:block;margin-bottom:6px;color:#4c5870}input,select,textarea{width:100%;padding:12px;border:1px solid #d9dced;border-radius:11px;font:inherit;color:var(--ink);background:#fff}input:focus,select:focus,textarea:focus{outline:3px solid #6941c622;border-color:var(--purple)}textarea{min-height:75px;resize:vertical}.full{grid-column:1/-1}
+.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(100deg,#6941c6,#8b5be5);color:#fff}.primary:hover{filter:brightness(.97)}.soft{background:#f0ebff;color:#5835b5;border:1px solid #e1d8ff}.delete{background:#fff0f4;color:#c32f62;border:1px solid #ffd4e1}.list{display:grid;gap:10px}.task{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:13px;padding:13px;background:#fff}.task.complete{border-left-color:var(--mint);background:#f4fffb}.task.overdue{border-left-color:#ef5350}.task-title{font-weight:900;margin-bottom:5px;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:900;background:#eaf2ff;color:#245db3;margin-top:7px}.badge.done{background:#dff8ef;color:#087856}.badge.late{background:#ffe8e8;color:#b42318}.actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}.actions button{font-size:12px;padding:8px 9px}.empty{background:#faf9ff;border:1px dashed #d8d1ee;border-radius:13px;padding:23px;text-align:center;color:var(--muted);line-height:1.5}.progress{height:11px;background:#eeeafa;border-radius:30px;overflow:hidden;margin:13px 0}.fill{height:100%;width:0;background:linear-gradient(90deg,#2cbf9b,#64d7bb);transition:width .25s}.footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}.notice{background:#fff8df;border:1px solid #ffe5a1;border-radius:12px;padding:12px 14px;color:#725317;font-size:13px;line-height:1.5;margin-bottom:16px}
+@media(max-width:760px){.columns{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}header{padding:20px}.logo{font-size:25px}}
+@media(max-width:470px){form{grid-template-columns:1fr}.full{grid-column:auto}.task{flex-direction:column}.actions{width:100%}.stat{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="logo">🌈 StudyBuddy</div><div class="sub">Your Smart Student Planner · Plan smarter. Study better.</div></div>
+ <div class="datepill" id="dateLabel"></div>
+</header>
+<main>
+ <section class="hero"><h1>Hi, student! Ready to get organised? ✨</h1><p>Add your homework, keep track of deadlines, plan revision and celebrate each task you finish. Your tasks are saved in this browser on this device.</p></section>
+ <div class="notice">💡 <b>Demo tip:</b> Add a task, click <b>Save Task</b>, then mark it <b>Done</b>. The page should stay here—nothing should open in another app.</div>
+ <section class="stats">
+  <div class="stat"><div class="emoji">📚</div><div class="label">All tasks</div><div class="num" id="total">0</div></div>
+  <div class="stat"><div class="emoji">📝</div><div class="label">Still to do</div><div class="num" id="pending">0</div></div>
+  <div class="stat"><div class="emoji">🎉</div><div class="label">Completed</div><div class="num" id="completed">0</div></div>
+  <div class="stat"><div class="emoji">🚀</div><div class="label">Progress</div><div class="num" id="percent">0%</div></div>
+ </section>
+ <nav class="tabs">
+  <button class="tab active" type="button" data-view="home">🏠 Dashboard</button>
+  <button class="tab" type="button" data-view="tasks">📝 Homework</button>
+  <button class="tab" type="button" data-view="exams">📅 Exams</button>
+  <button class="tab" type="button" data-view="planner">⏰ Study Planner</button>
+ </nav>
+ <section class="view active" id="home">
+  <div class="columns">
+   <div class="panel"><h2>📌 My task list</h2><div class="progress"><div class="fill" id="fill"></div></div><div class="hint" id="caption">Your progress will show here.</div><br><div class="list" id="homeList"></div></div>
+   <div class="panel"><h2>➕ Add a task</h2><form id="taskForm">
+    <div class="full"><label for="title">Task name *</label><input id="title" required maxlength="100" placeholder="e.g. Finish maths homework"></div>
+    <div><label for="subject">Subject</label><select id="subject"><option>Mathematics</option><option>Science</option><option>English</option><option>Tamil</option><option>Social Studies</option><option>Computer Science</option><option>Other</option></select></div>
+    <div><label for="kind">Type</label><select id="kind"><option>Homework</option><option>Assignment</option><option>Revision</option><option>Project</option></select></div>
+    <div class="full"><label for="due">Due date *</label><input id="due" type="date" required></div>
+    <div class="full"><label for="notes">Extra notes (optional)</label><textarea id="notes" placeholder="What do you need to remember?"></textarea></div>
+    <div class="full"><button class="btn primary" type="submit">💾 Save Task</button></div>
+   </form></div>
+  </div>
+ </section>
+ <section class="view" id="tasks"><div class="panel"><h2>📝 All homework and assignments</h2><div class="list" id="allList"></div></div></section>
+ <section class="view" id="exams"><div class="columns">
+  <div class="panel"><h2>📅 Add an exam</h2><form id="examForm"><div class="full"><label for="examSubject">Subject *</label><input id="examSubject" required placeholder="e.g. Science"></div><div class="full"><label for="examDate">Exam date *</label><input id="examDate" type="date" required></div><div class="full"><label for="examNotes">Chapters / notes</label><textarea id="examNotes" placeholder="Chapters to revise"></textarea></div><div class="full"><button class="btn primary" type="submit">➕ Save Exam</button></div></form></div>
+  <div class="panel"><h2>🗓️ Upcoming exams</h2><div class="list" id="examList"></div></div>
+ </div></section>
+ <section class="view" id="planner"><div class="columns">
+  <div class="panel"><h2>⏰ Plan a study session</h2><form id="studyForm"><div class="full"><label for="studySubject">Subject *</label><input id="studySubject" required placeholder="e.g. English"></div><div class="full"><label for="studyDate">Date *</label><input id="studyDate" type="date" required></div><div><label for="studyTime">Start time</label><input id="studyTime" type="time" value="17:00"></div><div><label for="duration">Duration</label><select id="duration"><option value="25">25 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="90">90 minutes</option></select></div><div class="full"><label for="goal">Study goal</label><textarea id="goal" placeholder="e.g. Revise chapter 2"></textarea></div><div class="full"><button class="btn primary" type="submit">➕ Save Study Session</button></div></form></div>
+  <div class="panel">
+   <h2>📚 My study sessions</h2>
+   <div class="notice" style="margin-bottom:12px">🔔 <b>Study reminders:</b> Turn reminders on to hear an alarm when a planned session is due. Keep StudyBuddy open for reminders to work.</div>
+   <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px">
+    <button class="btn primary" type="button" id="enableReminders">🔔 Enable reminders</button>
+    <button class="btn soft" type="button" id="testAlarm">▶ Test sound</button>
+   </div>
+   <div class="hint" id="reminderStatus" role="status" aria-live="polite">Reminders are currently off.</div>
+   <br><div class="list" id="studyList"></div>
+  </div>
+ </div></section>
+ <div class="footer">StudyBuddy student prototype · Data stays in this browser on this device.</div>
+</main>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const now=new Date();
+const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+$('dateLabel').textContent=now.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+['due','examDate','studyDate'].forEach(id=>$(id).value=today);
+function load(key){try{const v=localStorage.getItem('sb_'+key);return v?JSON.parse(v):[]}catch(e){return []}}
+function store(key,val){try{localStorage.setItem('sb_'+key,JSON.stringify(val));return true}catch(e){alert('The browser could not save this data. Please use a normal browser window, not private/incognito mode.');return false}}
+let tasks=load('tasks'),exams=load('exams'),sessions=load('sessions');
+let remindersEnabled=localStorage.getItem('sb_reminders_enabled')==='true';
+let alertedSessions=new Set(),audioContext=null;
+function playAlarm(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){$('reminderStatus').textContent='Sound is not supported by this browser.';return}
+  audioContext=audioContext||new AC();
+  if(audioContext.state==='suspended')audioContext.resume();
+  const start=audioContext.currentTime;
+  [0,0.28,0.56].forEach(offset=>{
+   const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+   osc.type='sine';osc.frequency.setValueAtTime(880,start+offset);
+   gain.gain.setValueAtTime(0.0001,start+offset);
+   gain.gain.exponentialRampToValueAtTime(0.20,start+offset+0.025);
+   gain.gain.exponentialRampToValueAtTime(0.0001,start+offset+0.20);
+   osc.connect(gain);gain.connect(audioContext.destination);
+   osc.start(start+offset);osc.stop(start+offset+0.22);
+  });
+ }catch(e){$('reminderStatus').textContent='Could not play sound. Check your device volume.'}
+}
+function updateReminderStatus(){
+ $('reminderStatus').textContent=remindersEnabled
+  ? '✅ Reminders are on. Keep this page open and your device volume turned up.'
+  : 'Reminders are currently off. Tap “Enable reminders” to turn them on.';
+}
+function checkStudyReminders(){
+ if(!remindersEnabled)return;
+ const n=new Date(),d=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+ const t=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+ sessions.forEach(s=>{
+  const key=s.id+'|'+s.date+'|'+s.time;
+  if(s.date===d&&s.time===t&&!alertedSessions.has(key)){
+   alertedSessions.add(key);playAlarm();
+   $('reminderStatus').textContent='⏰ Study time! '+s.subject+' session is starting now.';
+   if('Notification' in window&&Notification.permission==='granted'){
+    try{new Notification('StudyBuddy reminder',{body:'Time to study '+s.subject+'!'+(s.goal?' Goal: '+s.goal:'')})}catch(e){}
+   }
+  }
+ });
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dateText(s){if(!s)return 'No date';const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}
+function taskHtml(t){const late=!t.done&&t.due<today;return `<article class="task ${t.done?'complete':''} ${late?'overdue':''}"><div><div class="task-title">${esc(t.title)}</div><div class="meta">${esc(t.subject)} · ${esc(t.kind)}<br>Due: ${dateText(t.due)}${t.notes?'<br>'+esc(t.notes):''}</div><span class="badge ${t.done?'done':late?'late':''}">${t.done?'✓ COMPLETED':late?'OVERDUE':'PENDING'}</span></div><div class="actions"><button type="button" class="btn soft" data-toggle="${esc(t.id)}">${t.done?'Undo':'✓ Done'}</button><button type="button" class="btn delete" data-delete="${esc(t.id)}">Delete</button></div></article>`}
+function renderTasks(){const done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0; $('total').textContent=tasks.length;$('pending').textContent=tasks.length-done;$('completed').textContent=done;$('percent').textContent=pct+'%';$('fill').style.width=pct+'%';$('caption').textContent=tasks.length?`${done} of ${tasks.length} tasks completed. Keep going!`:'Add your first task to start your progress.';const sorted=[...tasks].sort((a,b)=>Number(a.done)-Number(b.done)||a.due.localeCompare(b.due));$('homeList').innerHTML=sorted.length?sorted.slice(0,5).map(taskHtml).join(''):'<div class="empty">🌟 No tasks yet! Add your first task using the form.</div>';$('allList').innerHTML=sorted.length?sorted.map(taskHtml).join(''):'<div class="empty">Your homework list is empty. Add a task on the Dashboard.</div>'}
+function renderExams(){$('examList').innerHTML=exams.length?[...exams].sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`<article class="task"><div><div class="task-title">${esc(x.subject)}</div><div class="meta">${dateText(x.date)}${x.notes?'<br>'+esc(x.notes):''}</div></div><button type="button" class="btn delete" data-exam-delete="${esc(x.id)}">Delete</button></article>`).join(''):'<div class="empty">No exams added yet.</div>'}
+function renderSessions(){$('studyList').innerHTML=sessions.length?[...sessions].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(x=>`<article class="task"><div><div class="task-title">${esc(x.subject)} · ${esc(x.duration)} min</div><div class="meta">${dateText(x.date)} at ${esc(x.time)}${x.goal?'<br>'+esc(x.goal):''}</div></div><button type="button" class="btn delete" data-session-delete="${esc(x.id)}">Delete</button></article>`).join(''):'<div class="empty">No study sessions planned yet.</div>'}
+$('taskForm').addEventListener('submit',function(e){e.preventDefault();e.stopPropagation();const title=$('title').value.trim();if(!title){$('title').focus();return}tasks.push({id:String(Date.now())+Math.random().toString(16).slice(2),title,subject:$('subject').value,kind:$('kind').value,due:$('due').value,notes:$('notes').value.trim(),done:false});store('tasks',tasks);renderTasks();this.reset();$('due').value=today;$('title').focus();});
+$('examForm').addEventListener('submit',function(e){e.preventDefault();e.stopPropagation();exams.push({id:String(Date.now())+Math.random().toString(16).slice(2),subject:$('examSubject').value.trim(),date:$('examDate').value,notes:$('examNotes').value.trim()});store('exams',exams);renderExams();this.reset();$('examDate').value=today});
+$('studyForm').addEventListener('submit',function(e){e.preventDefault();e.stopPropagation();sessions.push({id:String(Date.now())+Math.random().toString(16).slice(2),subject:$('studySubject').value.trim(),date:$('studyDate').value,time:$('studyTime').value,duration:$('duration').value,goal:$('goal').value.trim()});store('sessions',sessions);renderSessions();this.reset();$('studyDate').value=today;$('studyTime').value='17:00'});
+document.addEventListener('click',function(e){const b=e.target.closest('button');if(!b)return;if(b.dataset.toggle){tasks=tasks.map(t=>t.id===b.dataset.toggle?{...t,done:!t.done}:t);store('tasks',tasks);renderTasks()}if(b.dataset.delete){tasks=tasks.filter(t=>t.id!==b.dataset.delete);store('tasks',tasks);renderTasks()}if(b.dataset.examDelete){exams=exams.filter(t=>t.id!==b.dataset.examDelete);store('exams',exams);renderExams()}if(b.dataset.sessionDelete){sessions=sessions.filter(t=>t.id!==b.dataset.sessionDelete);store('sessions',sessions);renderSessions()}});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===b.dataset.view))}));
+$('enableReminders').addEventListener('click',async function(){
+ remindersEnabled=true;
+ try{localStorage.setItem('sb_reminders_enabled','true')}catch(e){}
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(AC){audioContext=audioContext||new AC();if(audioContext.state==='suspended')await audioContext.resume()}
+ }catch(e){}
+ if('Notification' in window&&Notification.permission==='default'){
+  try{await Notification.requestPermission()}catch(e){}
+ }
+ updateReminderStatus();playAlarm();
+});
+$('testAlarm').addEventListener('click',function(){
+ playAlarm();$('reminderStatus').textContent='🔊 Test alarm played. Check your device volume.';
+});
+updateReminderStatus();checkStudyReminders();
+setInterval(checkStudyReminders,10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkStudyReminders()});
+renderTasks();renderExams();renderSessions();
+})();
+</script>
+</body>
+</html>
